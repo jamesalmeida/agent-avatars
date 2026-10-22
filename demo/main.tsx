@@ -186,7 +186,7 @@ function Playground() {
             GitHub
           </a>
         </p>
-        <code style={{ fontSize: 14 }}>npm install @jamesalmeida/agent-avatars</code>
+        <code style={{ fontSize: 14 }}>npm install @general-system-ventures/agent-avatars</code>
       </header>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start" }}>
