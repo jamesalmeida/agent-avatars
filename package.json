@@ -1,12 +1,23 @@
 {
   "name": "@jamesalmeida/agent-avatars",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, writes and smiles. React, zero dependencies.",
-  "keywords": ["react", "avatar", "ai", "agent", "chatbot", "animation", "assistant"],
+  "keywords": [
+    "react",
+    "avatar",
+    "ai",
+    "agent",
+    "chatbot",
+    "animation",
+    "assistant"
+  ],
   "license": "MIT",
   "author": "James Almeida (https://www.jamesalmeida.me)",
   "homepage": "https://github.com/jamesalmeida/agent-avatars#readme",
-  "repository": { "type": "git", "url": "git+https://github.com/jamesalmeida/agent-avatars.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamesalmeida/agent-avatars.git"
+  },
   "bugs": "https://github.com/jamesalmeida/agent-avatars/issues",
   "type": "module",
   "sideEffects": false,
@@ -15,11 +26,19 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "vite demo",
@@ -43,5 +62,7 @@
     "vite": "^7.1.0",
     "vitest": "^4.1.12"
   },
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }
