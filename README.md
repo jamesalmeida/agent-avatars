@@ -21,13 +21,13 @@ Made for Skaffen, the assistant on [jamesalmeida.me](https://www.jamesalmeida.me
 ## Install
 
 ```bash
-npm install @general-systems-ventures/agent-avatars
+npm install @jamesalmeida/agent-avatars
 ```
 
 ## Use
 
 ```tsx
-import { AgentAvatar } from "@general-systems-ventures/agent-avatars";
+import { AgentAvatar } from "@jamesalmeida/agent-avatars";
 
 <AgentAvatar mood="writing" />;
 
@@ -37,7 +37,7 @@ import { AgentAvatar } from "@general-systems-ventures/agent-avatars";
 A chat message avatar that reacts to the conversation:
 
 ```tsx
-import { AgentAvatar, useHappyMoment } from "@general-systems-ventures/agent-avatars";
+import { AgentAvatar, useHappyMoment } from "@jamesalmeida/agent-avatars";
 
 function ReplyAvatar({ isLatest, isStreaming, userIsTyping, finishedTask }) {
   // Happy for ~3 s when a task finishes, then back to waiting.
