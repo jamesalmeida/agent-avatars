@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COLORS, DEFAULT_CONFIG, EYES, EYE_COLORS, SHAPES, avatarStyles, resolveConfig } from "./config";
+import { COLORS, DEFAULT_CONFIG, EYES, EYE_COLORS, LOOK_RANGE, SHAPES, avatarStyles, lookOffset, resolveConfig } from "./config";
 import { STYLE_ELEMENT_ID, agentAvatarCss, injectAgentAvatarStyles } from "./styles";
 
 describe("resolveConfig", () => {
@@ -56,5 +56,21 @@ describe("injectAgentAvatarStyles", () => {
 
   it("does nothing without a document", () => {
     expect(() => injectAgentAvatarStyles(undefined)).not.toThrow();
+  });
+});
+
+describe("lookOffset", () => {
+  it("looks toward the pointer, reaching full range one avatar-width away", () => {
+    expect(lookOffset(100, 0, 100, 240)).toEqual({ x: LOOK_RANGE.x, y: 0 });
+    expect(lookOffset(0, -50, 100, 240)).toEqual({ x: 0, y: -LOOK_RANGE.y / 2 });
+  });
+
+  it("stops following beyond the radius from the avatar's edge", () => {
+    expect(lookOffset(290, 0, 100, 240)).not.toBeNull();
+    expect(lookOffset(291, 0, 100, 240)).toBeNull();
+  });
+
+  it("looks straight ahead when the pointer is on the centre", () => {
+    expect(lookOffset(0, 0, 100, 240)).toEqual({ x: 0, y: 0 });
   });
 });

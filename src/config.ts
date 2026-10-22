@@ -154,3 +154,22 @@ export function avatarStyles(config: AvatarConfig): AvatarStyles {
     eyeColor,
   };
 }
+
+/** How far the eyes can move toward the pointer, in stage px. */
+export const LOOK_RANGE = { x: 14, y: 10 } as const;
+
+/** Default reach of `followPointer`: px beyond the avatar's edge. */
+export const DEFAULT_FOLLOW_RADIUS = 240;
+
+/**
+ * Where the eyes should look for a pointer at (dx, dy) px from the avatar's
+ * centre, or null when it is more than `radius` px beyond the avatar's edge.
+ * The eyes point toward the pointer and reach full range one avatar-width away.
+ */
+export function lookOffset(dx: number, dy: number, size: number, radius: number): { x: number; y: number } | null {
+  const distance = Math.hypot(dx, dy);
+  if (distance - size / 2 > radius) return null;
+  if (distance === 0) return { x: 0, y: 0 };
+  const pull = Math.min(1, distance / Math.max(size, 1));
+  return { x: (dx / distance) * LOOK_RANGE.x * pull, y: (dy / distance) * LOOK_RANGE.y * pull };
+}

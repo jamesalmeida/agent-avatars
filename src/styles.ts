@@ -1,13 +1,15 @@
 // Animations and transitions. Layout is inline on the elements, so the avatar
 // renders correctly (just still) before this stylesheet is injected, e.g. in SSR.
 
-export const STYLE_ELEMENT_ID = "agent-avatar-styles";
+export const STYLE_ELEMENT_ID = "agent-avatars-styles";
 
 export const agentAvatarCss = `
 .aa-avatar { --aa-spring: cubic-bezier(0.34, 1.56, 0.64, 1); }
 .aa-frame { transform-origin: 50% 90%; transition: width .6s var(--aa-spring), height .6s var(--aa-spring); }
 .aa-body { transition: background-color .5s ease, border-radius .6s var(--aa-spring), clip-path .6s var(--aa-spring), transform .6s var(--aa-spring); }
 .aa-shine { transition: opacity .45s ease; }
+.aa-track { transition: transform .25s ease-out; }
+.aa-avatar[data-tracking] .aa-look { animation: none; }
 .aa-look { transition: gap .45s var(--aa-spring), margin-top .6s var(--aa-spring), transform .6s var(--aa-spring); }
 .aa-eye { transform-origin: 50% 50%; transition: width .45s var(--aa-spring), height .45s var(--aa-spring), border-radius .45s ease, background-color .45s ease; animation: aa-blink 4.6s ease-in-out infinite; }
 .aa-listening .aa-look { transform: translate(-3px, 10px); }

@@ -10,6 +10,7 @@ An animated face for your AI agent: a squishy shape with two eyes that blinks, l
 
 - **Tiny:** about 3 KB gzipped, no dependencies (React is a peer).
 - **Moods:** `idle`, `listening`, `writing`, `happy`.
+- **Follows the pointer:** with `followPointer`, the eyes look at the mouse when it comes close.
 - **Customisable:** 6 shapes, preset or any hex colours, soft gradient or solid fill, 4 eye styles.
 - **Smooth:** shape, colour and eye changes morph with a little spring.
 - **Accessible:** respects `prefers-reduced-motion` (each mood keeps a still pose), decorative by default, `label` for an accessible name.
@@ -20,13 +21,13 @@ Made for Skaffen, the assistant on [jamesalmeida.me](https://www.jamesalmeida.me
 ## Install
 
 ```bash
-npm install @jamesalmeida/agent-avatar
+npm install @jamesalmeida/agent-avatars
 ```
 
 ## Use
 
 ```tsx
-import { AgentAvatar } from "@jamesalmeida/agent-avatar";
+import { AgentAvatar } from "@jamesalmeida/agent-avatars";
 
 <AgentAvatar mood="writing" />;
 
@@ -36,7 +37,7 @@ import { AgentAvatar } from "@jamesalmeida/agent-avatar";
 A chat message avatar that reacts to the conversation:
 
 ```tsx
-import { AgentAvatar, useHappyMoment } from "@jamesalmeida/agent-avatar";
+import { AgentAvatar, useHappyMoment } from "@jamesalmeida/agent-avatars";
 
 function ReplyAvatar({ isLatest, isStreaming, userIsTyping, finishedTask }) {
   // Happy for ~3 s when a task finishes, then back to waiting.
@@ -60,6 +61,7 @@ function ReplyAvatar({ isLatest, isStreaming, userIsTyping, finishedTask }) {
 | `eyeColor` | `"white" \| "cream" \| "mint" \| "ink"` or a hex colour | `"white"` | |
 | `size` | `number` | `28` | width and height in px |
 | `animated` | `boolean` | `true` | `false` holds a still pose |
+| `followPointer` | `boolean \| number` | `false` | while idle, the eyes follow the mouse within this many px of the avatar (`true` = 240) |
 | `label` | `string` | | accessible name; without it the avatar is `aria-hidden` |
 | `className`, `style` | | | on the outer element |
 
@@ -68,6 +70,7 @@ Unknown values fall back to the defaults, so a bad setting never breaks renderin
 ### Also exported
 
 - `useHappyMoment(active, ms = 2800)`: true for `ms` after `active` turns on.
+- `lookOffset(dx, dy, size, radius)`: where the eyes look for a pointer offset (used by `followPointer`).
 - `SHAPES`, `COLORS`, `EYES`, `EYE_COLORS`, `DEFAULT_CONFIG`: the presets, with labels, for building a settings UI.
 - `resolveConfig(input)`: validates untrusted settings (e.g. from a CMS or a settings store).
 - `agentAvatarCss`, `injectAgentAvatarStyles()`: the stylesheet, if you'd rather render it yourself (e.g. with a strict CSP nonce).

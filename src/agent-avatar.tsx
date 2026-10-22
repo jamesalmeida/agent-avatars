@@ -1,5 +1,13 @@
-import { useEffect, useInsertionEffect, useState, type CSSProperties } from "react";
-import { STAGE, avatarStyles, resolveConfig, type AvatarConfig, type AvatarMood } from "./config";
+import { useEffect, useInsertionEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import {
+  DEFAULT_FOLLOW_RADIUS,
+  STAGE,
+  avatarStyles,
+  lookOffset,
+  resolveConfig,
+  type AvatarConfig,
+  type AvatarMood,
+} from "./config";
 import { injectAgentAvatarStyles } from "./styles";
 
 export type AgentAvatarProps = Partial<AvatarConfig> & {
@@ -8,6 +16,11 @@ export type AgentAvatarProps = Partial<AvatarConfig> & {
   animated?: boolean;
   /** Width and height in px. Default 28. */
   size?: number;
+  /**
+   * While idle, the eyes follow the mouse when it comes within this many px of
+   * the avatar's edge. `true` uses 240. Off by default and with reduced motion.
+   */
+  followPointer?: boolean | number;
   /** An accessible name. Without one the avatar is decorative (aria-hidden). */
   label?: string;
   className?: string;
@@ -26,12 +39,18 @@ export function AgentAvatar({
   mood = "idle",
   animated = true,
   size = 28,
+  followPointer = false,
   label,
   className,
   style,
   ...options
 }: AgentAvatarProps) {
   useInsertionEffect(() => injectAgentAvatarStyles(), []);
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const stageRef = useRef<HTMLSpanElement>(null);
+  const trackRef = useRef<HTMLSpanElement>(null);
+  const radius = followPointer === true ? DEFAULT_FOLLOW_RADIUS : followPointer || 0;
+  usePointerFollow(rootRef, stageRef, trackRef, animated && mood === "idle" && radius > 0 ? radius : 0);
 
   const s = avatarStyles(resolveConfig(options));
   const arc: CSSProperties = {
@@ -48,10 +67,12 @@ export function AgentAvatar({
   return (
     <span
       {...a11y}
+      ref={rootRef}
       className={className}
       style={{ position: "relative", display: "inline-block", flexShrink: 0, width: size, height: size, ...style }}
     >
       <span
+        ref={stageRef}
         className={`aa-avatar aa-${mood}${animated ? "" : " aa-still"}`}
         style={{
           ...center,
@@ -76,23 +97,78 @@ export function AgentAvatar({
               }}
             />
           </span>
-          <span className="aa-look" style={{ ...center, position: "relative", ...s.look }}>
-            {mood === "happy" ? (
-              <>
-                <span style={arc} />
-                <span style={arc} />
-              </>
-            ) : (
-              <>
-                <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.leftEye }} />
-                <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.rightEye }} />
-              </>
-            )}
+          <span ref={trackRef} className="aa-track" style={{ ...center, position: "relative" }}>
+            <span className="aa-look" style={{ ...center, position: "relative", ...s.look }}>
+              {mood === "happy" ? (
+                <>
+                  <span style={arc} />
+                  <span style={arc} />
+                </>
+              ) : (
+                <>
+                  <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.leftEye }} />
+                  <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.rightEye }} />
+                </>
+              )}
+            </span>
           </span>
         </span>
       </span>
     </span>
   );
+}
+
+// Moves the eyes toward the pointer while it is within `radius` px of the avatar.
+// Writes styles directly (once per frame) instead of re-rendering.
+function usePointerFollow(
+  rootRef: RefObject<HTMLSpanElement | null>,
+  stageRef: RefObject<HTMLSpanElement | null>,
+  trackRef: RefObject<HTMLSpanElement | null>,
+  radius: number,
+) {
+  useEffect(() => {
+    const root = rootRef.current;
+    const stage = stageRef.current;
+    const track = trackRef.current;
+    if (!radius || !root || !stage || !track) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+
+    let frame = 0;
+    let pointer: { x: number; y: number } | null = null;
+
+    const pose = (offset: { x: number; y: number } | null) => {
+      track.style.transform = offset ? `translate(${offset.x.toFixed(2)}px, ${offset.y.toFixed(2)}px)` : "";
+      if (offset) stage.dataset.tracking = "";
+      else delete stage.dataset.tracking;
+    };
+    const update = () => {
+      frame = 0;
+      if (!pointer) return pose(null);
+      const rect = root.getBoundingClientRect();
+      pose(lookOffset(pointer.x - (rect.left + rect.width / 2), pointer.y - (rect.top + rect.height / 2), rect.width, radius));
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const onMove = (event: PointerEvent) => {
+      pointer = { x: event.clientX, y: event.clientY };
+      schedule();
+    };
+    const onLeave = (event: PointerEvent) => {
+      if (event.relatedTarget) return;
+      pointer = null;
+      schedule();
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerout", onLeave);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerout", onLeave);
+      cancelAnimationFrame(frame);
+      pose(null);
+    };
+  }, [rootRef, stageRef, trackRef, radius]);
 }
 
 /**

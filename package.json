@@ -1,5 +1,5 @@
 {
-  "name": "@jamesalmeida/agent-avatar",
+  "name": "@jamesalmeida/agent-avatars",
   "version": "0.1.0",
   "description": "An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, writes and smiles. React, zero dependencies.",
   "keywords": ["react", "avatar", "ai", "agent", "chatbot", "animation", "assistant"],
