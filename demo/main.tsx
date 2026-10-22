@@ -118,12 +118,51 @@ function Swatch({
   );
 }
 
+// A rainbow swatch over a hidden native colour picker.
+function CustomSwatch({
+  label,
+  value,
+  selected,
+  size,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  selected: boolean;
+  size: number;
+  onChange: (color: string) => void;
+}) {
+  return (
+    <label
+      title={label}
+      style={{
+        position: "relative",
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        cursor: "pointer",
+        background: "conic-gradient(#e66, #ec6, #6c6, #6ce, #66e, #c6e, #e66)",
+        boxShadow: selected ? `0 0 0 3px #fff, 0 0 0 5px ${ACCENT}` : "none",
+      }}
+    >
+      <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>{label}</span>
+      <input
+        type="color"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }}
+      />
+    </label>
+  );
+}
+
 function Playground() {
   const [config, setConfig] = useState<AvatarConfig>(DEFAULT_CONFIG);
   const [mood, setMood] = useState<AvatarMood>("idle");
   const [follow, setFollow] = useState(true);
   const set = (patch: Partial<AvatarConfig>) => setConfig((current) => ({ ...current, ...patch }));
   const isCustomColor = !(config.color in COLORS);
+  const isCustomEyeColor = !(config.eyeColor in EYE_COLORS);
 
   const code = [
     "<AgentAvatar",
@@ -197,28 +236,13 @@ function Playground() {
                   onClick={() => set({ color: color.id })}
                 />
               ))}
-              <label
-                title="Custom colour"
-                style={{
-                  position: "relative",
-                  width: 40,
-                  height: 40,
-                  borderRadius: "50%",
-                  cursor: "pointer",
-                  background: "conic-gradient(#e66, #ec6, #6c6, #6ce, #66e, #c6e, #e66)",
-                  boxShadow: isCustomColor ? `0 0 0 3px #fff, 0 0 0 5px ${ACCENT}` : "none",
-                }}
-              >
-                <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
-                  Custom colour
-                </span>
-                <input
-                  type="color"
-                  value={colorValue(config.color)}
-                  onChange={(event) => set({ color: event.target.value })}
-                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0, cursor: "pointer" }}
-                />
-              </label>
+              <CustomSwatch
+                label="Custom colour"
+                value={colorValue(config.color)}
+                selected={isCustomColor}
+                size={40}
+                onChange={(color) => set({ color })}
+              />
             </div>
           </Group>
 
@@ -238,7 +262,7 @@ function Playground() {
           </Group>
 
           <Group label="Eye colour">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
               {entries(EYE_COLORS).map((color) => (
                 <Swatch
                   key={color.id}
@@ -249,6 +273,13 @@ function Playground() {
                   onClick={() => set({ eyeColor: color.id })}
                 />
               ))}
+              <CustomSwatch
+                label="Custom eye colour"
+                value={eyeColorValue(config.eyeColor)}
+                selected={isCustomEyeColor}
+                size={36}
+                onChange={(eyeColor) => set({ eyeColor })}
+              />
             </div>
           </Group>
         </section>
