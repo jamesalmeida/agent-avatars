@@ -1,4 +1,4 @@
-# agent-avatar
+# agent-avatars
 
 An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, writes and smiles.
 
