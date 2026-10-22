@@ -24,6 +24,8 @@
     "build": "tsup",
     "dev": "vite demo",
     "build:demo": "vite build demo",
+    "build:pages": "vite build demo --base=/agent-avatars/",
+    "preview:svg": "node --experimental-strip-types scripts/preview-svg.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prepublishOnly": "npm run typecheck && npm test && npm run build"

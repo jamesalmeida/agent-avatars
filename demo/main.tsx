@@ -67,7 +67,13 @@ function Playground() {
     <main style={{ maxWidth: 1040, margin: "0 auto", padding: "40px 20px 64px", display: "flex", flexDirection: "column", gap: 24 }}>
       <header>
         <h1 style={{ margin: 0, fontSize: 40, fontWeight: 500, letterSpacing: "-0.02em" }}>agent-avatar</h1>
-        <p style={{ margin: "4px 0 0", color: "rgba(17,17,17,.68)" }}>An animated face for your AI agent.</p>
+        <p style={{ margin: "4px 0 0", color: "rgba(17,17,17,.68)" }}>
+          An animated face for your AI agent.{" "}
+          <a href="https://github.com/jamesalmeida/agent-avatars" style={{ color: "#2f4858" }}>
+            GitHub
+          </a>
+        </p>
+        <pre style={{ margin: "12px 0 0", fontSize: 14 }}>npm install @jamesalmeida/agent-avatar</pre>
       </header>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start" }}>
         <section style={{ flex: "1 1 360px", background: "#fff", borderRadius: 28, padding: 28, display: "flex", flexDirection: "column", gap: 20 }}>

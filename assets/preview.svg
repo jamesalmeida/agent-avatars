@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="912" height="120" viewBox="0 0 912 120" role="img" aria-label="Seven animated agent avatars in different shapes, colours and moods">
+  <defs>
+    <radialGradient id="shine" cx=".28" cy=".22" r="1.2" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#fff" stop-opacity=".3"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".34"/>
+    </radialGradient>
+    <style>
+.frame,.look,.eye{transform-box:fill-box}
+.frame{transform-origin:50% 90%}
+.eye{transform-origin:50% 50%;animation:blink 4.6s ease-in-out infinite}
+.frame.idle,.frame.listening{animation:squish 4.6s ease-in-out infinite}
+.look.idle{animation:glance 9s ease-in-out infinite}
+.look.listening{transform:translate(-3px,10px);animation:listen 2.4s ease-in-out infinite}
+.frame.writing{animation:bob 1.4s ease-in-out infinite}
+.look.writing{transform:translate(0,-10px);animation:read 2.2s ease-in-out infinite}
+.frame.happy{animation:hop 2.8s ease-out infinite}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+@keyframes blink{0%,90%,96%,100%{transform:scaleY(1)}93%{transform:scaleY(.1)}}
+@keyframes squish{0%,89%,100%{transform:scale(1,1)}92%{transform:scale(1.05,.94)}95%{transform:scale(.98,1.03)}}
+@keyframes glance{0%,28%,78%,100%{transform:translate(0,0)}34%,50%{transform:translate(-8px,1px)}56%,72%{transform:translate(7px,-3px)}}
+@keyframes listen{0%,100%{transform:translate(-3px,10px)}50%{transform:translate(-1px,12px)}}
+@keyframes read{0%,100%{transform:translate(-9px,-10px)}50%{transform:translate(9px,-10px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes hop{0%,30%,100%{transform:translateY(0) scale(1,1)}5%{transform:translateY(2px) scale(1.08,.9)}12%{transform:translateY(-12px) scale(.95,1.06)}20%{transform:translateY(0) scale(1.04,.96)}}
+</style>
+  </defs>
+  <g transform="translate(0 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame idle" style="animation-delay:0s">
+        <g><path d="M82 25 H118 A57 57 0 0 1 175 82 V118 A57 57 0 0 1 118 175 H82 A57 57 0 0 1 25 118 V82 A57 57 0 0 1 82 25 Z" fill="#2f4858"/><path d="M82 25 H118 A57 57 0 0 1 175 82 V118 A57 57 0 0 1 118 175 H82 A57 57 0 0 1 25 118 V82 A57 57 0 0 1 82 25 Z" fill="url(#shine)"/></g>
+        <g class="look idle"><rect class="eye" style="animation-delay:0s" x="67" y="82" width="20" height="36" rx="10" fill="#ffffff"/><rect class="eye" style="animation-delay:0s" x="113" y="82" width="20" height="36" rx="10" fill="#ffffff"/></g>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(132 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame idle" style="animation-delay:-1.3s">
+        <g><path d="M112.64 27 H112.64 A66.36 84.68 0 0 1 179 111.68 V111.68 A86.9 61.32 0 0 1 92.1 173 H92.1 A71.1 73 0 0 1 21 100 V100 A91.64 73 0 0 1 112.64 27 Z" fill="#b8664a"/><path d="M112.64 27 H112.64 A66.36 84.68 0 0 1 179 111.68 V111.68 A86.9 61.32 0 0 1 92.1 173 H92.1 A71.1 73 0 0 1 21 100 V100 A91.64 73 0 0 1 112.64 27 Z" fill="url(#shine)"/></g>
+        <g class="look idle"><rect class="eye" style="animation-delay:-1.3s" x="65" y="85" width="34" height="34" rx="17" fill="#ffffff"/><rect class="eye" style="animation-delay:-1.3s" x="119" y="94" width="16" height="16" rx="8" fill="#ffffff"/></g>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(264 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame writing" style="animation-delay:-2.6s">
+        <g><path d="M100 25 H100 A75 75 0 0 1 175 100 V100 A75 75 0 0 1 100 175 H100 A75 75 0 0 1 25 100 V100 A75 75 0 0 1 100 25 Z" fill="#2c6fb5"/><path d="M100 25 H100 A75 75 0 0 1 175 100 V100 A75 75 0 0 1 100 175 H100 A75 75 0 0 1 25 100 V100 A75 75 0 0 1 100 25 Z" fill="url(#shine)"/></g>
+        <g class="look writing"><rect class="eye" style="animation-delay:-2.6s" x="61" y="87" width="26" height="26" rx="13" fill="#ffffff"/><rect class="eye" style="animation-delay:-2.6s" x="113" y="87" width="26" height="26" rx="13" fill="#ffffff"/></g>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(396 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame listening" style="animation-delay:-3.9s">
+        <g transform="rotate(45 100 100)"><path d="M40 40 H100 A60 60 0 0 1 160 100 V100 A60 60 0 0 1 100 160 H100 A60 60 0 0 1 40 100 V40 A0 0 0 0 1 40 40 Z" fill="#5b4a6e"/><path d="M40 40 H100 A60 60 0 0 1 160 100 V100 A60 60 0 0 1 100 160 H100 A60 60 0 0 1 40 100 V40 A0 0 0 0 1 40 40 Z" fill="url(#shine)"/></g>
+        <g class="look listening"><rect class="eye" style="animation-delay:-3.9s" x="67" y="92" width="20" height="36" rx="10" fill="#f6efe1"/><rect class="eye" style="animation-delay:-3.9s" x="113" y="92" width="20" height="36" rx="10" fill="#f6efe1"/></g>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(528 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame idle" style="animation-delay:-5.2s">
+        <g><path d="M68 42 H132 A58 58 0 0 1 190 100 V100 A58 58 0 0 1 132 158 H68 A58 58 0 0 1 10 100 V100 A58 58 0 0 1 68 42 Z" fill="#2f6f6a"/><path d="M68 42 H132 A58 58 0 0 1 190 100 V100 A58 58 0 0 1 132 158 H68 A58 58 0 0 1 10 100 V100 A58 58 0 0 1 68 42 Z" fill="url(#shine)"/></g>
+        <g class="look idle"><rect class="eye" style="animation-delay:-5.2s" x="60" y="95" width="30" height="10" rx="5" fill="#c9f0e0"/><rect class="eye" style="animation-delay:-5.2s" x="110" y="95" width="30" height="10" rx="5" fill="#c9f0e0"/></g>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(660 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame happy" style="animation-delay:-6.5s">
+        <g><path d="M59.5 31.38 L140.5 31.38 L181 100 L140.5 168.62 L59.5 168.62 L19 100 Z" fill="#4f7a3a"/><path d="M59.5 31.38 L140.5 31.38 L181 100 L140.5 168.62 L59.5 168.62 L19 100 Z" fill="url(#shine)"/></g>
+        <g class="look happy"><path d="M58.5 105 A12.5 12.5 0 0 1 83.5 105" fill="none" stroke="#ffffff" stroke-width="7"/><path d="M116.5 105 A12.5 12.5 0 0 1 141.5 105" fill="none" stroke="#ffffff" stroke-width="7"/></g>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(792 0)">
+    <rect width="120" height="120" rx="28" fill="#8882" />
+    <g transform="translate(5 5) scale(0.55)">
+      <g class="frame idle" style="animation-delay:-7.8s">
+        <g><path d="M82 25 H118 A57 57 0 0 1 175 82 V118 A57 57 0 0 1 118 175 H82 A57 57 0 0 1 25 118 V82 A57 57 0 0 1 82 25 Z" fill="#121212"/><path d="M82 25 H118 A57 57 0 0 1 175 82 V118 A57 57 0 0 1 118 175 H82 A57 57 0 0 1 25 118 V82 A57 57 0 0 1 82 25 Z" fill="url(#shine)"/></g>
+        <g class="look idle"><rect class="eye" style="animation-delay:-7.8s" x="61" y="87" width="26" height="26" rx="13" fill="#ffffff"/><rect class="eye" style="animation-delay:-7.8s" x="113" y="87" width="26" height="26" rx="13" fill="#ffffff"/></g>
+      </g>
+    </g>
+  </g>
+</svg>

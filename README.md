@@ -2,6 +2,12 @@
 
 An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, writes and smiles.
 
+<p align="center">
+  <a href="https://jamesalmeida.github.io/agent-avatars/"><img src="assets/preview.svg" alt="Seven animated agent avatars in different shapes, colours and moods" width="900"></a>
+</p>
+
+<p align="center"><strong><a href="https://jamesalmeida.github.io/agent-avatars/">Try the playground →</a></strong></p>
+
 - **Tiny:** about 3 KB gzipped, no dependencies (React is a peer).
 - **Moods:** `idle`, `listening`, `writing`, `happy`.
 - **Customisable:** 6 shapes, preset or any hex colours, soft gradient or solid fill, 4 eye styles.
@@ -70,10 +76,13 @@ Unknown values fall back to the defaults, so a bad setting never breaks renderin
 
 ```bash
 npm install
-npm run dev        # playground at http://localhost:5173
+npm run dev          # playground at http://localhost:5173
 npm test
+npm run preview:svg  # regenerate assets/preview.svg after changing presets
 npm run build
 ```
+
+The playground deploys to GitHub Pages on every push to `main` (the Pages workflow).
 
 ## Release
 
