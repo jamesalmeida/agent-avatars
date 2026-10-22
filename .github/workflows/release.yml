@@ -2,7 +2,8 @@ name: Release
 
 # Publish to npm when a GitHub release is published (tag 0.1.0 or v0.1.0),
 # or by hand from the Actions tab (Run workflow). Publishes the version in
-# package.json. Needs an NPM_TOKEN repository secret.
+# package.json. Auth: npm Trusted Publishing (set on the package's npm
+# settings page: GitHub Actions, this repo, release.yml), no token needed.
 on:
   release:
     types: [published]
@@ -10,7 +11,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance
+  id-token: write # npm Trusted Publishing and provenance
 
 jobs:
   publish:
@@ -33,6 +34,4 @@ jobs:
             echo "Release tag $TAG does not match package.json version $VERSION"
             exit 1
           fi
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --provenance

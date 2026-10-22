@@ -43,5 +43,5 @@
     "vite": "^7.1.0",
     "vitest": "^4.1.12"
   },
-  "publishConfig": { "access": "public", "provenance": true }
+  "publishConfig": { "access": "public" }
 }
