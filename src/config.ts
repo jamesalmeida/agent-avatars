@@ -42,6 +42,7 @@ export const COLORS = {
   plum: { label: "Plum", value: "#5b4a6e" },
   clay: { label: "Clay", value: "#b8664a" },
   moss: { label: "Moss", value: "#4f7a3a" },
+  black: { label: "Black", value: "#121212" },
 } as const;
 
 export const EYE_COLORS = {

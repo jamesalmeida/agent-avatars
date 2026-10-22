@@ -48,7 +48,7 @@ function ReplyAvatar({ isLatest, isStreaming, userIsTyping, finishedTask }) {
 | --- | --- | --- | --- |
 | `mood` | `"idle" \| "listening" \| "writing" \| "happy"` | `"idle"` | idle blinks and glances; listening looks down; writing looks up and scans; happy squints and hops |
 | `shape` | `"circle" \| "squircle" \| "pill" \| "blob" \| "drop" \| "hexagon"` | `"squircle"` | |
-| `color` | `"slate" \| "teal" \| "ocean" \| "plum" \| "clay" \| "moss"` or a hex colour | `"slate"` | |
+| `color` | `"slate" \| "teal" \| "ocean" \| "plum" \| "clay" \| "moss" \| "black"` or a hex colour | `"slate"` | |
 | `fill` | `"gradient" \| "solid"` | `"gradient"` | |
 | `eyes` | `"round" \| "tall" \| "calm" \| "curious"` | `"tall"` | |
 | `eyeColor` | `"white" \| "cream" \| "mint" \| "ink"` or a hex colour | `"white"` | |
