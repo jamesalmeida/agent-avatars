@@ -89,7 +89,7 @@ The playground deploys to GitHub Pages on every push to `main` (the Pages workfl
 
 ## Release
 
-Bump `version` in `package.json`, push, then publish a GitHub release tagged `v<version>`. The Release workflow publishes to npm with provenance (needs the `NPM_TOKEN` secret).
+Bump `version` in `package.json`, push, then publish a GitHub release tagged with that version (`0.2.0` or `v0.2.0`), or run the Release workflow by hand from the Actions tab. The Release workflow publishes to npm with provenance (needs the `NPM_TOKEN` secret).
 
 ## License
 
