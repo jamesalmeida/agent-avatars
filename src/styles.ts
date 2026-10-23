@@ -13,12 +13,15 @@ export const agentAvatarCss = `
 .aa-look { transition: gap .45s var(--aa-spring), margin-top .6s var(--aa-spring), transform .6s var(--aa-spring); }
 .aa-eye { transform-origin: 50% 50%; transition: width .45s var(--aa-spring), height .45s var(--aa-spring), border-radius .45s ease, background-color .45s ease; animation: aa-blink 4.6s ease-in-out infinite; }
 .aa-listening .aa-look { transform: translate(-3px, 10px); }
-.aa-writing .aa-look { transform: translate(0, -10px); }
+.aa-thinking .aa-look { transform: translate(8px, -11px); }
+.aa-writing .aa-look { transform: translate(-10px, 6px); }
 .aa-idle .aa-frame, .aa-listening .aa-frame { animation: aa-squish 4.6s ease-in-out infinite; }
 .aa-idle .aa-look { animation: aa-glance 9s ease-in-out infinite; }
 .aa-listening .aa-look { animation: aa-listen 2.4s ease-in-out infinite; }
+.aa-thinking .aa-frame { animation: aa-tilt 3.6s ease-in-out infinite; }
+.aa-thinking .aa-look { animation: aa-ponder 3.6s ease-in-out infinite; }
 .aa-writing .aa-frame { animation: aa-bob 1.4s ease-in-out infinite; }
-.aa-writing .aa-look { animation: aa-read 2.2s ease-in-out infinite; }
+.aa-writing .aa-look { animation: aa-write 1.8s ease-in-out infinite; }
 .aa-happy .aa-frame { animation: aa-hop 1.4s ease-out 2; }
 .aa-avatar.aa-still * { animation: none; transition: none; }
 @media (prefers-reduced-motion: reduce) { .aa-avatar * { animation: none !important; transition: none !important; } }
@@ -26,8 +29,10 @@ export const agentAvatarCss = `
 @keyframes aa-squish { 0%, 89%, 100% { transform: scale(1, 1); } 92% { transform: scale(1.05, .94); } 95% { transform: scale(.98, 1.03); } }
 @keyframes aa-glance { 0%, 28%, 78%, 100% { transform: translate(0, 0); } 34%, 50% { transform: translate(-8px, 1px); } 56%, 72% { transform: translate(7px, -3px); } }
 @keyframes aa-listen { 0%, 100% { transform: translate(-3px, 10px); } 50% { transform: translate(-1px, 12px); } }
-@keyframes aa-read { 0%, 100% { transform: translate(-9px, -10px); } 50% { transform: translate(9px, -10px); } }
-@keyframes aa-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes aa-ponder { 0%, 36%, 100% { transform: translate(8px, -11px); } 50%, 86% { transform: translate(-8px, -11px); } }
+@keyframes aa-tilt { 0%, 36%, 100% { transform: rotate(4deg) scale(1); } 18% { transform: rotate(4deg) scale(1.03); } 50%, 86% { transform: rotate(-4deg) scale(1); } 68% { transform: rotate(-4deg) scale(1.03); } }
+@keyframes aa-write { 0% { transform: translate(-10px, 6px); } 78% { transform: translate(10px, 6px); } 100% { transform: translate(-10px, 6px); } }
+@keyframes aa-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 @keyframes aa-hop { 0%, 60%, 100% { transform: translateY(0) scale(1, 1); } 10% { transform: translateY(2px) scale(1.08, .9); } 25% { transform: translateY(-12px) scale(.95, 1.06); } 40% { transform: translateY(0) scale(1.04, .96); } }
 `;
 

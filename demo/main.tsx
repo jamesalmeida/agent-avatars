@@ -19,6 +19,7 @@ const MUTED = "rgba(17,17,17,.68)";
 const MOODS: { id: AvatarMood; label: string }[] = [
   { id: "idle", label: "Waiting" },
   { id: "listening", label: "Listening" },
+  { id: "thinking", label: "Thinking" },
   { id: "writing", label: "Writing" },
   { id: "happy", label: "Happy" },
 ];

@@ -39,10 +39,18 @@ A chat message avatar that reacts to the conversation:
 ```tsx
 import { AgentAvatar, useHappyMoment } from "@jamesalmeida/agent-avatars";
 
-function ReplyAvatar({ isLatest, isStreaming, userIsTyping, finishedTask }) {
+function ReplyAvatar({ isLatest, isWaiting, isStreaming, userIsTyping, finishedTask }) {
   // Happy for ~3 s when a task finishes, then back to waiting.
   const isHappy = useHappyMoment(isLatest && finishedTask && !isStreaming);
-  const mood = isStreaming ? "writing" : isHappy ? "happy" : isLatest && userIsTyping ? "listening" : "idle";
+  const mood = isWaiting
+    ? "thinking" // sent, no tokens yet
+    : isStreaming
+      ? "writing"
+      : isHappy
+        ? "happy"
+        : isLatest && userIsTyping
+          ? "listening"
+          : "idle";
 
   // Only animate the newest message; older avatars hold still.
   return <AgentAvatar mood={mood} animated={isLatest} />;
@@ -53,7 +61,7 @@ function ReplyAvatar({ isLatest, isStreaming, userIsTyping, finishedTask }) {
 
 | Prop | Type | Default | |
 | --- | --- | --- | --- |
-| `mood` | `"idle" \| "listening" \| "writing" \| "happy"` | `"idle"` | idle blinks and glances; listening looks down; writing looks up and scans; happy squints and hops |
+| `mood` | `"idle" \| "listening" \| "thinking" \| "writing" \| "happy"` | `"idle"` | idle blinks and glances; listening looks down; thinking looks up and ponders, tilting side to side; writing looks down and scans like it's writing a line; happy squints and hops |
 | `shape` | `"circle" \| "squircle" \| "pill" \| "blob" \| "drop" \| "hexagon"` | `"squircle"` | |
 | `color` | `"slate" \| "teal" \| "ocean" \| "plum" \| "clay" \| "moss" \| "black"` or a hex colour | `"slate"` | |
 | `fill` | `"gradient" \| "solid"` | `"gradient"` | |
