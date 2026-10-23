@@ -8,6 +8,7 @@ export const agentAvatarCss = `
 .aa-frame { transform-origin: 50% 90%; transition: width .6s var(--aa-spring), height .6s var(--aa-spring); }
 .aa-body { transition: background-color .5s ease, border-radius .6s var(--aa-spring), clip-path .6s var(--aa-spring), transform .6s var(--aa-spring); }
 .aa-shine { transition: opacity .45s ease; }
+.aa-outline { transition: border-radius .6s var(--aa-spring), clip-path .6s var(--aa-spring), transform .6s var(--aa-spring), background-color .5s ease; }
 .aa-face, .aa-unrotate { transition: border-radius .6s var(--aa-spring), transform .6s var(--aa-spring); }
 .aa-track { transition: transform .25s ease-out; }
 .aa-avatar[data-tracking] .aa-look { animation: none; }

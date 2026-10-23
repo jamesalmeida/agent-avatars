@@ -11,7 +11,9 @@ An animated face for your AI agent: a squishy shape with two eyes that blinks, l
 - **Tiny:** about 3 KB gzipped, no dependencies (React is a peer).
 - **Moods:** `idle`, `listening`, `thinking`, `writing`, `happy`.
 - **Spins:** `spin` turns the face round: the eyes slide off one side and come back from the other.
-- **Follows the pointer:** with `followPointer`, the eyes look at the mouse when it comes close.
+- **Follows the pointer and focus:** with `followPointer`, the eyes look at the mouse when it comes close; with `followFocus`, at whatever has focus.
+- **Settings UI included:** `<AvatarEditor>` gives any app an avatar settings panel with a live preview.
+- **Works on dark backgrounds:** `outline` adds a subtle edge so a dark avatar doesn't disappear.
 - **Customisable:** 6 shapes, preset or any hex colours, soft gradient or solid fill, 4 eye styles.
 - **Smooth:** shape, colour and eye changes morph with a little spring.
 - **Accessible:** respects `prefers-reduced-motion` (each mood keeps a still pose), decorative by default, `label` for an accessible name.
@@ -71,12 +73,53 @@ function ReplyAvatar({ isLatest, isWaiting, isStreaming, userIsTyping, finishedT
 | `size` | `number` | `28` | width and height in px |
 | `animated` | `boolean` | `true` | `false` holds a still pose |
 | `followPointer` | `boolean \| number` | `false` | while idle, the eyes follow the mouse within this many px of the avatar (`true` = 240) |
+| `followFocus` | `boolean` | `false` | while idle, the eyes look at whatever has keyboard focus (an input, a button) until the pointer moves |
+| `outline` | `boolean \| string` | `false` | a thin outline around the body for dark backgrounds; `true` uses the `--aa-outline-color` CSS variable (default a soft white), a string is any CSS colour |
 | `spin` | `number` | | each change plays one turn (a little wind-up, the eyes slide off one side and back in from the other); a counter works well, e.g. `spin={taps}`. Mounting doesn't spin |
 | `spinMs` | `number` | `1100` | how long a turn takes |
 | `label` | `string` | | accessible name; without it the avatar is `aria-hidden` |
 | `className`, `style` | | | on the outer element |
 
 Unknown values fall back to the defaults, so a bad setting never breaks rendering.
+
+### Avatar settings
+
+`<AvatarEditor>` is a ready-made settings panel: shape, colour (presets or any colour), fill, eyes and eye colour, with an optional live preview and mood switcher. It is controlled, so you save what it gives you.
+
+```tsx
+import { AgentAvatar, AvatarEditor, type AvatarConfig } from "@jamesalmeida/agent-avatars";
+
+function AvatarSettings({ saved, onSave }: { saved: AvatarConfig; onSave: (config: AvatarConfig) => void }) {
+  const [draft, setDraft] = useState(saved);
+  return (
+    <>
+      <AvatarEditor value={draft} onChange={setDraft} />
+      <button onClick={() => onSave(draft)}>Save</button>
+    </>
+  );
+}
+```
+
+| Prop | Type | Default | |
+| --- | --- | --- | --- |
+| `value` | `Partial<AvatarConfig>` | | the avatar being edited |
+| `onChange` | `(next: AvatarConfig) => void` | | called with the full config on every change |
+| `preview` | `boolean` | `true` | a live preview with a mood switcher above the options |
+| `previewSize` | `number` | `140` | |
+| `followPointer` | `boolean \| number` | `true` | for the preview |
+| `outline` | `boolean \| string` | | for the preview and the shape tiles |
+| `className`, `style` | | | on the outer element |
+
+It inherits your font and text colour. Theme the rest with CSS variables on it or any parent: `--aa-editor-accent` (selected outlines), `--aa-editor-text`, `--aa-editor-muted`, `--aa-editor-border`, `--aa-editor-control` (tracks and tiles), `--aa-editor-selected` (selected pill) and `--aa-editor-ring` (the gap around a selected swatch; your background colour).
+
+### Dark backgrounds
+
+`outline` draws a thin edge around the body. With `outline={true}` the colour comes from `--aa-outline-color`, so one CSS rule can show it only in dark mode:
+
+```css
+:root { --aa-outline-color: transparent; }
+.dark { --aa-outline-color: rgba(255, 255, 255, 0.28); }
+```
 
 ### Also exported
 
