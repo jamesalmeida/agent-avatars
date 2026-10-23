@@ -1,6 +1,6 @@
 # agent-avatars
 
-An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, writes and smiles.
+An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, thinks, writes, smiles and spins.
 
 <p align="center">
   <a href="https://jamesalmeida.github.io/agent-avatars/"><img src="assets/preview.svg" alt="Seven animated agent avatars in different shapes, colours and moods" width="900"></a>
@@ -9,7 +9,8 @@ An animated face for your AI agent: a squishy shape with two eyes that blinks, l
 <p align="center"><strong><a href="https://jamesalmeida.github.io/agent-avatars/">Try the playground →</a></strong></p>
 
 - **Tiny:** about 3 KB gzipped, no dependencies (React is a peer).
-- **Moods:** `idle`, `listening`, `writing`, `happy`.
+- **Moods:** `idle`, `listening`, `thinking`, `writing`, `happy`.
+- **Spins:** `spin` turns the face round: the eyes slide off one side and come back from the other.
 - **Follows the pointer:** with `followPointer`, the eyes look at the mouse when it comes close.
 - **Customisable:** 6 shapes, preset or any hex colours, soft gradient or solid fill, 4 eye styles.
 - **Smooth:** shape, colour and eye changes morph with a little spring.
@@ -70,6 +71,8 @@ function ReplyAvatar({ isLatest, isWaiting, isStreaming, userIsTyping, finishedT
 | `size` | `number` | `28` | width and height in px |
 | `animated` | `boolean` | `true` | `false` holds a still pose |
 | `followPointer` | `boolean \| number` | `false` | while idle, the eyes follow the mouse within this many px of the avatar (`true` = 240) |
+| `spin` | `number` | | each change plays one turn (a little wind-up, the eyes slide off one side and back in from the other); a counter works well, e.g. `spin={taps}`. Mounting doesn't spin |
+| `spinMs` | `number` | `1100` | how long a turn takes |
 | `label` | `string` | | accessible name; without it the avatar is `aria-hidden` |
 | `className`, `style` | | | on the outer element |
 

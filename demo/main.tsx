@@ -161,6 +161,7 @@ function Playground() {
   const [config, setConfig] = useState<AvatarConfig>(DEFAULT_CONFIG);
   const [mood, setMood] = useState<AvatarMood>("idle");
   const [follow, setFollow] = useState(true);
+  const [spins, setSpins] = useState(0);
   const set = (patch: Partial<AvatarConfig>) => setConfig((current) => ({ ...current, ...patch }));
   const isCustomColor = !(config.color in COLORS);
   const isCustomEyeColor = !(config.eyeColor in EYE_COLORS);
@@ -174,6 +175,7 @@ function Playground() {
     `  eyeColor="${config.eyeColor}"`,
     `  mood="${mood}"`,
     ...(follow ? ["  followPointer"] : []),
+    ...(spins ? ["  spin={turns}"] : []),
     "/>",
   ].join("\n");
 
@@ -288,20 +290,27 @@ function Playground() {
         <section aria-label="Preview" style={{ ...card, flex: "1 1 440px", gap: 20 }}>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <Segmented options={MOODS} value={mood} onChange={setMood} />
+            <button
+              type="button"
+              onClick={() => setSpins((count) => count + 1)}
+              style={{ minHeight: 44, padding: "0 18px", borderRadius: 999, border: 0, cursor: "pointer", background: ACCENT, color: "#fff" }}
+            >
+              Spin
+            </button>
             <label style={{ display: "flex", alignItems: "center", gap: 8, minHeight: 44, fontSize: 14, color: MUTED, cursor: "pointer" }}>
               <input type="checkbox" checked={follow} onChange={() => setFollow(!follow)} style={{ width: 18, height: 18, accentColor: ACCENT }} />
               Follow pointer
             </label>
           </div>
           <div style={{ height: 320, borderRadius: 24, background: "#f1eee6", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <AgentAvatar {...config} mood={mood} size={240} followPointer={follow} label="Agent avatar preview" />
+            <AgentAvatar {...config} mood={mood} size={240} followPointer={follow} spin={spins} label="Agent avatar preview" />
           </div>
           <p style={{ margin: "-8px 0 0", fontSize: 14, color: MUTED }}>
             {follow && mood === "idle" ? "Move your mouse near the avatar: its eyes follow while it's waiting." : " "}
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {[20, 28, 40, 64].map((size) => (
-              <AgentAvatar key={size} {...config} mood={mood} size={size} followPointer={follow} />
+              <AgentAvatar key={size} {...config} mood={mood} size={size} followPointer={follow} spin={spins} />
             ))}
           </div>
           <pre style={{ margin: 0, padding: 16, borderRadius: 16, background: "#14202a", color: "#f5f5f5", fontSize: 13, overflowX: "auto" }}>
