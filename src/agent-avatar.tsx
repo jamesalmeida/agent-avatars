@@ -22,6 +22,17 @@ export type AgentAvatarProps = Partial<AvatarConfig> & {
    */
   followPointer?: boolean | number;
   /**
+   * While idle, the eyes look at whatever has keyboard focus on the page (an input,
+   * a button), until the pointer moves. Off by default and with reduced motion.
+   */
+  followFocus?: boolean;
+  /**
+   * A thin outline around the body, so a dark avatar stays visible on a dark
+   * background. `true` uses the `--aa-outline-color` CSS variable (default a soft
+   * white), so you can switch it per theme in CSS; a string is any CSS colour.
+   */
+  outline?: boolean | string;
+  /**
    * Each change plays one turn: the face winds up, then spins round, the eyes
    * sliding off one side of the body and back in from the other. A counter
    * works well, e.g. `spin={taps}`. Mounting doesn't spin.
@@ -36,6 +47,13 @@ export type AgentAvatarProps = Partial<AvatarConfig> & {
 };
 
 const DEFAULT_SPIN_MS = 1100;
+/** The outline's width on screen, in px, whatever the avatar's size. */
+const OUTLINE_PX = 1.5;
+
+// Scales the body's copy so it shows OUTLINE_PX on each side (the stage is scaled to `size`).
+function outlineScale(length: number, size: number): number {
+  return 1 + (2 * OUTLINE_PX * (STAGE / size)) / length;
+}
 
 const fill = { position: "absolute", inset: 0 } as const;
 const center = { display: "flex", alignItems: "center", justifyContent: "center" } as const;
@@ -50,6 +68,8 @@ export function AgentAvatar({
   animated = true,
   size = 28,
   followPointer = false,
+  followFocus = false,
+  outline = false,
   spin,
   spinMs = DEFAULT_SPIN_MS,
   label,
@@ -62,7 +82,8 @@ export function AgentAvatar({
   const stageRef = useRef<HTMLSpanElement>(null);
   const trackRef = useRef<HTMLSpanElement>(null);
   const radius = followPointer === true ? DEFAULT_FOLLOW_RADIUS : followPointer || 0;
-  usePointerFollow(rootRef, stageRef, trackRef, animated && mood === "idle" && radius > 0 ? radius : 0);
+  const isIdle = animated && mood === "idle";
+  useLookAround(rootRef, stageRef, trackRef, isIdle && radius > 0 ? radius : 0, isIdle && followFocus);
   const turn = useTurn(spin, spinMs);
 
   const s = avatarStyles(resolveConfig(options));
@@ -100,6 +121,20 @@ export function AgentAvatar({
         }}
       >
         <span className="aa-frame" style={{ ...center, position: "relative", ...s.frame }}>
+          {outline ? (
+            // A copy of the body in the outline colour, a few px bigger on each side.
+            <span
+              className="aa-outline"
+              aria-hidden
+              style={{
+                ...fill,
+                backgroundColor: outline === true ? "var(--aa-outline-color, rgba(255, 255, 255, 0.28))" : outline,
+                borderRadius: s.body.borderRadius,
+                clipPath: s.body.clipPath,
+                transform: `${s.body.transform === "none" ? "" : s.body.transform} scale(${outlineScale(s.frame.width, size)}, ${outlineScale(s.frame.height, size)})`,
+              }}
+            />
+          ) : null}
           <span className="aa-body" style={{ ...fill, overflow: "hidden", ...s.body }}>
             <span
               className="aa-shine"
@@ -164,40 +199,56 @@ function useTurn(spin: number | undefined, ms: number) {
   return turn;
 }
 
-// Moves the eyes toward the pointer while it is within `radius` px of the avatar.
+// Moves the eyes toward the pointer while it is within `radius` px of the avatar,
+// and, with `followFocus`, toward the focused element. Whichever moved last wins:
+// a focus change looks at the new element until the pointer moves again.
 // Writes styles directly (once per frame) instead of re-rendering.
-function usePointerFollow(
+function useLookAround(
   rootRef: RefObject<HTMLSpanElement | null>,
   stageRef: RefObject<HTMLSpanElement | null>,
   trackRef: RefObject<HTMLSpanElement | null>,
   radius: number,
+  followFocus: boolean,
 ) {
   useEffect(() => {
     const root = rootRef.current;
     const stage = stageRef.current;
     const track = trackRef.current;
-    if (!radius || !root || !stage || !track) return;
+    if ((!radius && !followFocus) || !root || !stage || !track) return;
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
 
     let frame = 0;
     let pointer: { x: number; y: number } | null = null;
+    let source: "pointer" | "focus" = "focus";
 
     const pose = (offset: { x: number; y: number } | null) => {
       track.style.transform = offset ? `translate(${offset.x.toFixed(2)}px, ${offset.y.toFixed(2)}px)` : "";
       if (offset) stage.dataset.tracking = "";
       else delete stage.dataset.tracking;
     };
+    const focusTarget = (): { x: number; y: number } | null => {
+      const element = document.activeElement;
+      if (!followFocus || !element || element === document.body || root.contains(element)) return null;
+      const rect = element.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return null;
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    };
     const update = () => {
       frame = 0;
-      if (!pointer) return pose(null);
       const rect = root.getBoundingClientRect();
-      pose(lookOffset(pointer.x - (rect.left + rect.width / 2), pointer.y - (rect.top + rect.height / 2), rect.width, radius));
+      const look = (point: { x: number; y: number }, reach: number) =>
+        lookOffset(point.x - (rect.left + rect.width / 2), point.y - (rect.top + rect.height / 2), rect.width, reach);
+      const toPointer = radius && pointer ? look(pointer, radius) : null;
+      const focus = focusTarget();
+      const toFocus = focus ? look(focus, Number.POSITIVE_INFINITY) : null;
+      pose(source === "pointer" ? (toPointer ?? toFocus) : (toFocus ?? toPointer));
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
     const onMove = (event: PointerEvent) => {
       pointer = { x: event.clientX, y: event.clientY };
+      source = "pointer";
       schedule();
     };
     const onLeave = (event: PointerEvent) => {
@@ -205,16 +256,33 @@ function usePointerFollow(
       pointer = null;
       schedule();
     };
+    const onFocus = () => {
+      source = "focus";
+      schedule();
+    };
 
-    window.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerout", onLeave);
+    if (radius) {
+      window.addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("pointerout", onLeave);
+    }
+    if (followFocus) {
+      document.addEventListener("focusin", onFocus);
+      document.addEventListener("focusout", onFocus);
+      window.addEventListener("resize", schedule);
+      window.addEventListener("scroll", schedule, { capture: true, passive: true });
+      schedule();
+    }
     return () => {
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerout", onLeave);
+      document.removeEventListener("focusin", onFocus);
+      document.removeEventListener("focusout", onFocus);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, { capture: true });
       cancelAnimationFrame(frame);
       pose(null);
     };
-  }, [rootRef, stageRef, trackRef, radius]);
+  }, [rootRef, stageRef, trackRef, radius, followFocus]);
 }
 
 /**

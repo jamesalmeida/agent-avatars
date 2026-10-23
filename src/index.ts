@@ -1,4 +1,5 @@
 export { AgentAvatar, useHappyMoment, type AgentAvatarProps } from "./agent-avatar";
+export { AvatarEditor, type AvatarEditorProps } from "./avatar-editor";
 export {
   COLORS,
   DEFAULT_CONFIG,
