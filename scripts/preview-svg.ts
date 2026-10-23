@@ -15,7 +15,7 @@ const TILES: Tile[] = [
   { shape: "drop", color: "plum", fill: "gradient", eyes: "tall", eyeColor: "cream", mood: "listening" },
   { shape: "pill", color: "teal", fill: "gradient", eyes: "calm", eyeColor: "mint", mood: "idle" },
   { shape: "hexagon", color: "moss", fill: "gradient", eyes: "round", eyeColor: "white", mood: "happy" },
-  { shape: "squircle", color: "black", fill: "gradient", eyes: "round", eyeColor: "white", mood: "idle" },
+  { shape: "squircle", color: "black", fill: "gradient", eyes: "round", eyeColor: "white", mood: "thinking" },
 ];
 
 const TILE = 120;
@@ -117,16 +117,20 @@ const css = `
 .frame.idle,.frame.listening{animation:squish 4.6s ease-in-out infinite}
 .look.idle{animation:glance 9s ease-in-out infinite}
 .look.listening{transform:translate(-3px,10px);animation:listen 2.4s ease-in-out infinite}
+.frame.thinking{animation:tilt 3.6s ease-in-out infinite}
+.look.thinking{transform:translate(8px,-11px);animation:ponder 3.6s ease-in-out infinite}
 .frame.writing{animation:bob 1.4s ease-in-out infinite}
-.look.writing{transform:translate(0,-10px);animation:read 2.2s ease-in-out infinite}
+.look.writing{transform:translate(-10px,6px);animation:write 1.8s ease-in-out infinite}
 .frame.happy{animation:hop 2.8s ease-out infinite}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 @keyframes blink{0%,90%,96%,100%{transform:scaleY(1)}93%{transform:scaleY(.1)}}
 @keyframes squish{0%,89%,100%{transform:scale(1,1)}92%{transform:scale(1.05,.94)}95%{transform:scale(.98,1.03)}}
 @keyframes glance{0%,28%,78%,100%{transform:translate(0,0)}34%,50%{transform:translate(-8px,1px)}56%,72%{transform:translate(7px,-3px)}}
 @keyframes listen{0%,100%{transform:translate(-3px,10px)}50%{transform:translate(-1px,12px)}}
-@keyframes read{0%,100%{transform:translate(-9px,-10px)}50%{transform:translate(9px,-10px)}}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes ponder{0%,36%,100%{transform:translate(8px,-11px)}50%,86%{transform:translate(-8px,-11px)}}
+@keyframes tilt{0%,36%,100%{transform:rotate(4deg) scale(1)}18%{transform:rotate(4deg) scale(1.03)}50%,86%{transform:rotate(-4deg) scale(1)}68%{transform:rotate(-4deg) scale(1.03)}}
+@keyframes write{0%{transform:translate(-10px,6px)}78%{transform:translate(10px,6px)}100%{transform:translate(-10px,6px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @keyframes hop{0%,30%,100%{transform:translateY(0) scale(1,1)}5%{transform:translateY(2px) scale(1.08,.9)}12%{transform:translateY(-12px) scale(.95,1.06)}20%{transform:translateY(0) scale(1.04,.96)}}
 `;
 

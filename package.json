@@ -1,7 +1,7 @@
 {
   "name": "@jamesalmeida/agent-avatars",
-  "version": "0.1.1",
-  "description": "An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, writes and smiles. React, zero dependencies.",
+  "version": "0.2.0",
+  "description": "An animated face for your AI agent: a squishy shape with two eyes that blinks, listens, thinks, writes and smiles. React, zero dependencies.",
   "keywords": [
     "react",
     "avatar",

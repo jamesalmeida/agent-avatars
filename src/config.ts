@@ -72,10 +72,11 @@ export type AvatarEyeColor = keyof typeof EYE_COLORS | (string & {});
 /**
  * idle: blinks with a little squish and glances around.
  * listening: looks down, e.g. while the user types.
- * writing: looks up and scans, e.g. while a reply streams.
+ * thinking: looks up and ponders, tilting side to side, e.g. before a reply starts.
+ * writing: looks down and scans like it's writing a line, e.g. while a reply streams.
  * happy: a squint and a hop, e.g. when a task is done.
  */
-export type AvatarMood = "idle" | "listening" | "writing" | "happy";
+export type AvatarMood = "idle" | "listening" | "thinking" | "writing" | "happy";
 
 export type AvatarConfig = {
   shape: AvatarShape;
