@@ -21,11 +21,21 @@ export type AgentAvatarProps = Partial<AvatarConfig> & {
    * the avatar's edge. `true` uses 240. Off by default and with reduced motion.
    */
   followPointer?: boolean | number;
+  /**
+   * Each change plays one turn: the face winds up, then spins round, the eyes
+   * sliding off one side of the body and back in from the other. A counter
+   * works well, e.g. `spin={taps}`. Mounting doesn't spin.
+   */
+  spin?: number;
+  /** How long a turn takes, in ms. Default 1100. */
+  spinMs?: number;
   /** An accessible name. Without one the avatar is decorative (aria-hidden). */
   label?: string;
   className?: string;
   style?: CSSProperties;
 };
+
+const DEFAULT_SPIN_MS = 1100;
 
 const fill = { position: "absolute", inset: 0 } as const;
 const center = { display: "flex", alignItems: "center", justifyContent: "center" } as const;
@@ -40,6 +50,8 @@ export function AgentAvatar({
   animated = true,
   size = 28,
   followPointer = false,
+  spin,
+  spinMs = DEFAULT_SPIN_MS,
   label,
   className,
   style,
@@ -51,6 +63,7 @@ export function AgentAvatar({
   const trackRef = useRef<HTMLSpanElement>(null);
   const radius = followPointer === true ? DEFAULT_FOLLOW_RADIUS : followPointer || 0;
   usePointerFollow(rootRef, stageRef, trackRef, animated && mood === "idle" && radius > 0 ? radius : 0);
+  const turn = useTurn(spin, spinMs);
 
   const s = avatarStyles(resolveConfig(options));
   const arc: CSSProperties = {
@@ -73,8 +86,9 @@ export function AgentAvatar({
     >
       <span
         ref={stageRef}
-        className={`aa-avatar aa-${mood}${animated ? "" : " aa-still"}`}
+        className={`aa-avatar aa-${mood}${animated ? "" : " aa-still"}${turn === null ? "" : ` aa-turning aa-turn-${turn}`}`}
         style={{
+          ["--aa-spin" as string]: `${spinMs}ms`,
           ...center,
           position: "absolute",
           top: 0,
@@ -97,25 +111,57 @@ export function AgentAvatar({
               }}
             />
           </span>
-          <span ref={trackRef} className="aa-track" style={{ ...center, position: "relative" }}>
-            <span className="aa-look" style={{ ...center, position: "relative", ...s.look }}>
-              {mood === "happy" ? (
-                <>
-                  <span style={arc} />
-                  <span style={arc} />
-                </>
-              ) : (
-                <>
-                  <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.leftEye }} />
-                  <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.rightEye }} />
-                </>
-              )}
+          {/* Clipped to the body while turning, so the eyes slide out of sight round its edge. */}
+          <span
+            className="aa-face"
+            style={{
+              ...fill,
+              borderRadius: s.body.borderRadius,
+              transform: s.body.transform,
+              ...(turn === null ? {} : { overflow: "hidden", clipPath: s.body.clipPath }),
+            }}
+          >
+            <span className="aa-unrotate" style={{ ...fill, ...center, transform: s.unrotate }}>
+              <span className="aa-spin" style={{ ...center, position: "relative" }}>
+                <span ref={trackRef} className="aa-track" style={{ ...center, position: "relative" }}>
+                  <span className="aa-look" style={{ ...center, position: "relative", ...s.look }}>
+                    {mood === "happy" ? (
+                      <>
+                        <span style={arc} />
+                        <span style={arc} />
+                      </>
+                    ) : (
+                      <>
+                        <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.leftEye }} />
+                        <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.rightEye }} />
+                      </>
+                    )}
+                  </span>
+                </span>
+              </span>
             </span>
           </span>
         </span>
       </span>
     </span>
   );
+}
+
+// The turn playing now (0 or 1, alternating so a change mid-turn restarts the
+// animation), or null. Ignores the first value, so mounting doesn't spin.
+function useTurn(spin: number | undefined, ms: number) {
+  const [turn, setTurn] = useState<0 | 1 | null>(null);
+  const last = useRef(spin);
+
+  useEffect(() => {
+    if (spin === last.current) return;
+    last.current = spin;
+    setTurn((current) => (current === 0 ? 1 : 0));
+    const timer = setTimeout(() => setTurn(null), ms);
+    return () => clearTimeout(timer);
+  }, [spin, ms]);
+
+  return turn;
 }
 
 // Moves the eyes toward the pointer while it is within `radius` px of the avatar.

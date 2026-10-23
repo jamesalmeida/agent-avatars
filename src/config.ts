@@ -125,6 +125,8 @@ export function eyeColorValue(color: AvatarEyeColor): string {
 export type AvatarStyles = {
   frame: { width: number; height: number };
   body: { backgroundColor: string; borderRadius: string; clipPath: string; transform: string };
+  /** Undoes the body's rotation, so a layer clipped to the body can hold upright eyes. */
+  unrotate: string;
   shineOpacity: number;
   look: { gap: number; marginTop: number };
   leftEye: { width: number; height: number; borderRadius: string; backgroundColor: string };
@@ -146,6 +148,7 @@ export function avatarStyles(config: AvatarConfig): AvatarStyles {
       clipPath: shape.clip,
       transform: shape.rotate,
     },
+    unrotate: shape.rotate === "none" ? "none" : shape.rotate.replace("rotate(", "rotate(-"),
     // The gradient is a light/shade overlay on a flat colour, so colour changes can fade.
     shineOpacity: config.fill === "gradient" ? 1 : 0,
     // Margin moves a flex-centred child by half its value.
