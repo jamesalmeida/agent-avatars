@@ -104,6 +104,7 @@ export const agentAvatarCss = `
 
 .aa-asleep .aa-frame { animation: aa-breathe 4.4s ease-in-out ${D} infinite; }
 .aa-asleep .aa-look { transform: translate(0, 8px); animation: aa-doze 4.4s ease-in-out ${D} infinite; }
+.aa-asleep .aa-eye { translate: 0 2px; animation: none; transition: width 1.4s ease-in-out, height 1.4s ease-in-out, border-radius 1.4s ease-in-out, scale 1.4s ease-in-out, translate 1.4s ease-in-out, background-color .45s ease; }
 
 ${gestureCss}
 .aa-avatar.aa-still * { animation: none; transition: none; }

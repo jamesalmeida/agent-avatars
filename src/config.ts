@@ -85,7 +85,7 @@ export type AvatarEyeColor = keyof typeof EYE_COLORS | (string & {});
  * sorry: droopy eyes looking down, sagging, e.g. when a task fails.
  * dizzy: spinning × eyes and a wobble, e.g. on an error.
  * drowsy: heavy eyelids, nodding off.
- * asleep: eyes closed, breathing slowly, e.g. when the chat has been quiet a while.
+ * asleep: eyes shut to thin lines, breathing slowly, e.g. when the chat has been quiet a while.
  */
 export const MOODS = {
   idle: { label: "Waiting" },

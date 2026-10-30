@@ -118,7 +118,7 @@ Unknown values fall back to the defaults, so a bad setting never breaks renderin
 | `sorry` | droopy eyes looking down, sagging | a task failed |
 | `dizzy` | spinning × eyes and a wobble | an error |
 | `drowsy` | heavy eyelids, nodding off | the page has been quiet |
-| `asleep` | eyes closed, breathing slowly | the page has been quiet a while |
+| `asleep` | eyes shut to thin lines (from `drowsy` they close slowly), breathing slowly | the page has been quiet a while |
 
 ### Avatar settings
 

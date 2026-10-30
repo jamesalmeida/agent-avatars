@@ -142,13 +142,11 @@ export function AgentAvatar({
   useLookAround(rootRef, stageRef, trackRef, isIdle && radius > 0 ? radius : 0, isIdle && followFocus, isIdle ? lookAt : null);
 
   const s = avatarStyles(config);
-  // Happy squints (^ ^) and asleep closes the eyes (‿ ‿): both draw arcs instead of eyes.
+  // Happy squints (^ ^): arcs instead of eyes.
   const arc: CSSProperties | null =
     shown === "happy"
       ? { ...arcBase, height: 17, borderColor: s.eyeColor, borderWidth: "7px 7px 0", borderRadius: "32px 32px 0 0" }
-      : shown === "asleep"
-        ? { ...arcBase, height: 14, borderColor: s.eyeColor, borderWidth: "0 6px 6px", borderRadius: "0 0 32px 32px" }
-        : null;
+      : null;
   const bar = (angle: number): CSSProperties => ({
     position: "absolute",
     left: 0,
@@ -166,7 +164,10 @@ export function AgentAvatar({
       <span style={bar(-45)} />
     </span>
   );
-  const round = shown === "confused" ? ROUND_EYE : null;
+  // Asleep shuts the eyes to thin lines. They stay the same elements, so drowsy's
+  // heavy lids close the rest of the way (the stylesheet slows that transition).
+  const shut = { width: Math.max(24, Math.min(s.leftEye.width, s.rightEye.width)), height: 5, borderRadius: "3px" };
+  const eyeShape = shown === "confused" ? ROUND_EYE : shown === "asleep" ? shut : null;
   const isTurning = act?.name === "spin";
   const a11y = label ? { role: "img", "aria-label": label } : { "aria-hidden": true };
   const classes = [
@@ -259,8 +260,8 @@ export function AgentAvatar({
                         </>
                       ) : (
                         <>
-                          <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.leftEye, ...round }} />
-                          <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.rightEye, ...round }} />
+                          <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.leftEye, ...eyeShape }} />
+                          <span className="aa-eye" style={{ display: "block", flexShrink: 0, ...s.rightEye, ...eyeShape }} />
                         </>
                       )}
                     </span>
