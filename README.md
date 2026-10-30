@@ -12,7 +12,7 @@ An animated face for your AI agent: a squishy shape with two eyes that blinks, l
 - **16 moods:** `idle`, `listening`, `thinking`, `working`, `searching`, `reading`, `writing`, `focused`, `happy`, `love`, `surprised`, `confused`, `sorry`, `dizzy`, `drowsy`, `asleep`.
 - **Gestures:** `nod`, `shake`, `wink`, `jump`, `wiggle`, `peek` and `spin` play once, on top of any mood.
 - **Feels alive:** avatars on a page blink out of step; with `interactive` a poke startles it and stroking it makes it happy; with `sleepAfter` it dozes off when the page is quiet and wakes with a start.
-- **Talks:** `level` (or the `--aa-level` CSS variable) makes it pulse with speech loudness.
+- **Talks:** `speaking` makes it chatter (e.g. while a reply streams in); `level` (or the `--aa-level` CSS variable) makes it pulse with real speech loudness.
 - **Looks around:** with `followPointer`, the eyes look at the mouse when it comes close; with `followFocus`, at whatever has focus; with `lookAt`, at any element or point.
 - **Chat-ready:** `useAgentMood(status)` picks the mood from an AI SDK chat status.
 - **Settings UI included:** `<AvatarEditor>` gives any app an avatar settings panel with a live preview.
@@ -93,6 +93,7 @@ On older messages, `animated={false}` holds a still pose.
 | `spin` | `number` | | each change plays one turn (a little wind-up, the eyes slide off one side and back in from the other); a counter works well, e.g. `spin={taps}`. Mounting doesn't spin |
 | `spinMs` | `number` | `1100` | how long a turn takes |
 | `gesture` | `{ name, id }` | | plays the gesture `name` (`"nod" \| "shake" \| "wink" \| "jump" \| "wiggle" \| "peek" \| "spin"`) each time `id` changes; `useGesture()` makes one. Mounting doesn't play |
+| `speaking` | `boolean` | `false` | talks without audio: the body pulses and the eyes bob in syllables and words, e.g. while a reply streams in. Ignored when `level` is set; off with reduced motion |
 | `level` | `number` | | speech loudness, 0 to 1 (e.g. from text-to-speech audio): the body pulses and the eyes bob. To skip a re-render every frame, set the `--aa-level` CSS variable on a parent instead |
 | `label` | `string` | | accessible name; without it the avatar is `aria-hidden` |
 | `className`, `style` | | | on the outer element |

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
 import { AgentAvatar, useGesture } from "./agent-avatar";
 import {
   COLORS,
@@ -139,29 +139,6 @@ const SLEEP_OPTIONS = [
   { id: "300000", label: "5 min" },
 ];
 
-// Fakes speech loudness for the preview: syllables about 4.5 a second, in words
-// with short pauses. Writes the --aa-level variable on `ref` (no re-renders).
-function useFakeSpeech(ref: { current: HTMLElement | null }, on: boolean) {
-  useEffect(() => {
-    const element = ref.current;
-    if (!on || !element) return;
-    let frame = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const t = (now - start) / 1000;
-      const syllable = Math.max(0, Math.sin(t * Math.PI * 9));
-      const inWord = Math.sin(t * Math.PI * 1.4) > -0.35 ? 1 : 0.1;
-      element.style.setProperty("--aa-level", (syllable * inWord * (0.55 + 0.45 * Math.sin(t * 3.1) ** 2)).toFixed(3));
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(frame);
-      element.style.removeProperty("--aa-level");
-    };
-  }, [ref, on]);
-}
-
 const ringShadow = `0 0 0 3px ${v.ring}, 0 0 0 5px ${v.accent}`;
 
 function Swatch({ label, color, selected, onClick }: { label: string; color: string; selected: boolean; onClick: () => void }) {
@@ -244,8 +221,6 @@ export function AvatarEditor({
   const [mood, setMood] = useState<AvatarMood>("idle");
   const [gesture, playGesture] = useGesture();
   const [speaking, setSpeaking] = useState(false);
-  const stageRef = useRef<HTMLDivElement>(null);
-  useFakeSpeech(stageRef, speaking);
   const set = (patch: Partial<AvatarConfig>) => onChange({ ...config, ...patch });
 
   return (
@@ -256,7 +231,6 @@ export function AvatarEditor({
       {preview ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           <div
-            ref={stageRef}
             style={{
               display: "flex",
               alignItems: "center",
@@ -271,6 +245,7 @@ export function AvatarEditor({
               {...config}
               mood={mood}
               gesture={gesture}
+              speaking={speaking}
               size={previewSize}
               followPointer={followPointer}
               outline={outline}

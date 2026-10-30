@@ -74,6 +74,11 @@ export type AgentAvatarProps = Partial<AvatarConfig> & {
    * skips re-rendering on every frame.
    */
   level?: number;
+  /**
+   * Talks without audio: the body pulses and the eyes bob in syllables and words,
+   * e.g. while a reply streams in. Ignored when `level` is set. Off with reduced motion.
+   */
+  speaking?: boolean;
   /** An accessible name. Without one the avatar is decorative (aria-hidden). */
   label?: string;
   className?: string;
@@ -114,6 +119,7 @@ export function AgentAvatar({
   spinMs = DEFAULT_SPIN_MS,
   gesture,
   level,
+  speaking = false,
   label,
   className,
   style,
@@ -127,6 +133,7 @@ export function AgentAvatar({
   const delay = useLoopDelay();
 
   const { act, play } = useAct(animated);
+  useFakeSpeech(stageRef, speaking && animated && level === undefined);
   usePlayOnChange(spin, () => play("spin", spinMs));
   usePlayOnChange(gesture?.id, () => {
     if (!gesture || !Object.prototype.hasOwnProperty.call(GESTURES, gesture.name)) return;
@@ -617,4 +624,28 @@ export function useAgentMood(
   }, [finished, happyMs]);
 
   return moodForChat({ status, isTyping, isHappy, errorMood });
+}
+
+// Fakes speech loudness: syllables about 4.5 a second, in words with short pauses.
+// Writes the --aa-level variable on `ref` (no re-renders). Off with reduced motion.
+function useFakeSpeech(ref: { current: HTMLElement | null }, on: boolean) {
+  useEffect(() => {
+    const element = ref.current;
+    if (!on || !element) return;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    let frame = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = (now - start) / 1000;
+      const syllable = Math.max(0, Math.sin(t * Math.PI * 9));
+      const inWord = Math.sin(t * Math.PI * 1.4) > -0.35 ? 1 : 0.1;
+      element.style.setProperty("--aa-level", (syllable * inWord * (0.55 + 0.45 * Math.sin(t * 3.1) ** 2)).toFixed(3));
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frame);
+      element.style.removeProperty("--aa-level");
+    };
+  }, [ref, on]);
 }
