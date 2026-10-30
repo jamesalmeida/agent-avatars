@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { COLORS, DEFAULT_CONFIG, EYES, EYE_COLORS, LOOK_RANGE, SHAPES, avatarStyles, lookOffset, resolveConfig } from "./config";
+import {
+  COLORS,
+  DEFAULT_CONFIG,
+  EYES,
+  EYE_COLORS,
+  GESTURES,
+  LOOK_RANGE,
+  MAX_SLEEP_AFTER,
+  MOODS,
+  SHAPES,
+  avatarFromSeed,
+  avatarStyles,
+  lookOffset,
+  moodForChat,
+  resolveConfig,
+} from "./config";
 import { STYLE_ELEMENT_ID, agentAvatarCss, injectAgentAvatarStyles } from "./styles";
 
 describe("resolveConfig", () => {
@@ -16,6 +31,14 @@ describe("resolveConfig", () => {
     for (const eyes of Object.keys(EYES)) expect(resolveConfig({ eyes }).eyes).toBe(eyes);
     for (const eyeColor of Object.keys(EYE_COLORS)) expect(resolveConfig({ eyeColor }).eyeColor).toBe(eyeColor);
     expect(resolveConfig({ fill: "solid" }).fill).toBe("solid");
+  });
+
+  it("accepts the behaviour options and rejects bad ones", () => {
+    expect(resolveConfig({ interactive: true, sleepAfter: 60_000 })).toMatchObject({ interactive: true, sleepAfter: 60_000 });
+    for (const sleepAfter of [-1, MAX_SLEEP_AFTER + 1, Number.NaN, Number.POSITIVE_INFINITY, "60000"]) {
+      expect(resolveConfig({ sleepAfter }).sleepAfter).toBe(DEFAULT_CONFIG.sleepAfter);
+    }
+    expect(resolveConfig({ interactive: "yes" }).interactive).toBe(false);
   });
 
   it("accepts hex colours and rejects other strings", () => {
@@ -54,6 +77,14 @@ describe("injectAgentAvatarStyles", () => {
     expect(appended[0]).toMatchObject({ id: STYLE_ELEMENT_ID, textContent: agentAvatarCss });
   });
 
+  it("animates every mood", () => {
+    for (const mood of Object.keys(MOODS)) expect(agentAvatarCss).toContain(`.aa-${mood} .aa-`);
+  });
+
+  it("has every gesture", () => {
+    for (const gesture of [...Object.keys(GESTURES), "boop"]) expect(agentAvatarCss).toContain(`.aa-g-${gesture}.aa-p0 `);
+  });
+
   it("does nothing without a document", () => {
     expect(() => injectAgentAvatarStyles(undefined)).not.toThrow();
   });
@@ -72,5 +103,34 @@ describe("lookOffset", () => {
 
   it("looks straight ahead when the pointer is on the centre", () => {
     expect(lookOffset(0, 0, 100, 240)).toEqual({ x: 0, y: 0 });
+  });
+});
+
+describe("avatarFromSeed", () => {
+  it("gives the same valid look for the same name", () => {
+    expect(avatarFromSeed("Skaffen")).toEqual(avatarFromSeed("Skaffen"));
+    for (const name of ["Skaffen", "Ada", "", "🦊"]) {
+      const config = avatarFromSeed(name);
+      expect(resolveConfig(config)).toEqual(config);
+    }
+  });
+
+  it("spreads names across the options", () => {
+    const looks = new Set(Array.from({ length: 40 }, (_, i) => JSON.stringify(avatarFromSeed(`agent-${i}`))));
+    const shapes = new Set(Array.from({ length: 40 }, (_, i) => avatarFromSeed(`agent-${i}`).shape));
+    expect(looks.size).toBeGreaterThan(30);
+    expect(shapes.size).toBe(Object.keys(SHAPES).length);
+  });
+});
+
+describe("moodForChat", () => {
+  it("maps each chat status to a mood", () => {
+    expect(moodForChat({ status: "submitted" })).toBe("thinking");
+    expect(moodForChat({ status: "streaming", isHappy: true })).toBe("writing");
+    expect(moodForChat({ status: "error" })).toBe("sorry");
+    expect(moodForChat({ status: "error", errorMood: "dizzy" })).toBe("dizzy");
+    expect(moodForChat({ status: "ready", isHappy: true, isTyping: true })).toBe("happy");
+    expect(moodForChat({ status: "ready", isTyping: true })).toBe("listening");
+    expect(moodForChat({ status: undefined })).toBe("idle");
   });
 });

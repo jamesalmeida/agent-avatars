@@ -73,10 +73,59 @@ export type AvatarEyeColor = keyof typeof EYE_COLORS | (string & {});
  * idle: blinks with a little squish and glances around.
  * listening: looks down, e.g. while the user types.
  * thinking: looks up and ponders, tilting side to side, e.g. before a reply starts.
+ * working: the eyes circle like a loading spinner, e.g. while a tool runs.
+ * searching: sweeps from side to side, leaning in, e.g. during a web or file search.
+ * reading: skims down a page line by line, e.g. while it reads a file or a link.
  * writing: looks down and scans like it's writing a line, e.g. while a reply streams.
+ * focused: narrows its eyes and leans in, e.g. on a hard step like running tests.
  * happy: a squint and a hop, e.g. when a task is done.
+ * love: heart eyes that beat, e.g. when the user says thanks.
+ * surprised: jumps, eyes wide, e.g. at an unexpected result.
+ * confused: tilts its head; the eyes go round and askew and keep swapping sizes.
+ * sorry: droopy eyes looking down, sagging, e.g. when a task fails.
+ * dizzy: spinning × eyes and a wobble, e.g. on an error.
+ * drowsy: heavy eyelids, nodding off.
+ * asleep: eyes closed, breathing slowly, e.g. when the chat has been quiet a while.
  */
-export type AvatarMood = "idle" | "listening" | "thinking" | "writing" | "happy";
+export const MOODS = {
+  idle: { label: "Waiting" },
+  listening: { label: "Listening" },
+  thinking: { label: "Thinking" },
+  working: { label: "Working" },
+  searching: { label: "Searching" },
+  reading: { label: "Reading" },
+  writing: { label: "Writing" },
+  focused: { label: "Focused" },
+  happy: { label: "Happy" },
+  love: { label: "Love" },
+  surprised: { label: "Surprised" },
+  confused: { label: "Confused" },
+  sorry: { label: "Sorry" },
+  dizzy: { label: "Dizzy" },
+  drowsy: { label: "Drowsy" },
+  asleep: { label: "Asleep" },
+} as const;
+
+export type AvatarMood = keyof typeof MOODS;
+
+/**
+ * One-shot moves, played on top of any mood (see AgentAvatar's `gesture`).
+ * `ms` is how long each takes; spin uses `spinMs`.
+ */
+export const GESTURES = {
+  nod: { label: "Nod", ms: 900 },
+  shake: { label: "Shake", ms: 900 },
+  wink: { label: "Wink", ms: 750 },
+  jump: { label: "Jump", ms: 850 },
+  wiggle: { label: "Wiggle", ms: 900 },
+  peek: { label: "Peek", ms: 1500 },
+  spin: { label: "Spin", ms: 1100 },
+} as const;
+
+export type AvatarGesture = keyof typeof GESTURES;
+
+/** The longest `sleepAfter` accepted: an hour. */
+export const MAX_SLEEP_AFTER = 3_600_000;
 
 export type AvatarConfig = {
   shape: AvatarShape;
@@ -84,6 +133,10 @@ export type AvatarConfig = {
   fill: AvatarFill;
   eyes: AvatarEyes;
   eyeColor: AvatarEyeColor;
+  /** Reacts to the pointer: a poke startles it, hovering gets its attention, stroking it back and forth makes it happy. */
+  interactive: boolean;
+  /** While idle, dozes off (drowsy, then asleep) after this many ms with no activity on the page. 0 = never. */
+  sleepAfter: number;
 };
 
 export const DEFAULT_CONFIG: AvatarConfig = {
@@ -92,6 +145,8 @@ export const DEFAULT_CONFIG: AvatarConfig = {
   fill: "gradient",
   eyes: "tall",
   eyeColor: "white",
+  interactive: false,
+  sleepAfter: 0,
 };
 
 const HEX = /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i;
@@ -104,13 +159,80 @@ const isColor = (table: object, value: unknown): value is string =>
 
 /** Fills unknown or missing options from DEFAULT_CONFIG, so bad input never breaks rendering. */
 export function resolveConfig(input: Partial<Record<keyof AvatarConfig, unknown>> = {}): AvatarConfig {
+  const sleepAfter = input.sleepAfter;
   return {
     shape: has(SHAPES, input.shape) ? input.shape : DEFAULT_CONFIG.shape,
     color: isColor(COLORS, input.color) ? input.color : DEFAULT_CONFIG.color,
     fill: input.fill === "solid" || input.fill === "gradient" ? input.fill : DEFAULT_CONFIG.fill,
     eyes: has(EYES, input.eyes) ? input.eyes : DEFAULT_CONFIG.eyes,
     eyeColor: isColor(EYE_COLORS, input.eyeColor) ? input.eyeColor : DEFAULT_CONFIG.eyeColor,
+    interactive: typeof input.interactive === "boolean" ? input.interactive : DEFAULT_CONFIG.interactive,
+    sleepAfter:
+      typeof sleepAfter === "number" && Number.isFinite(sleepAfter) && sleepAfter >= 0 && sleepAfter <= MAX_SLEEP_AFTER
+        ? sleepAfter
+        : DEFAULT_CONFIG.sleepAfter,
   };
+}
+
+/** A 32-bit FNV-1a hash: the same string always gives the same number. */
+export function hashString(value: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * A look picked from a name (or any string), the same every time, like an identicon:
+ * e.g. one avatar per agent without anyone choosing. Behaviour options are the defaults.
+ */
+export function avatarFromSeed(seed: string): AvatarConfig {
+  let state = hashString(seed);
+  const pick = <T extends object>(table: T): keyof T => {
+    // mulberry32: spreads the hash so each option is picked independently.
+    state = (state + 0x6d2b79f5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    const keys = Object.keys(table) as (keyof T)[];
+    return keys[(((t ^ (t >>> 14)) >>> 0) % keys.length)];
+  };
+  return {
+    ...DEFAULT_CONFIG,
+    shape: pick(SHAPES),
+    color: pick(COLORS),
+    eyes: pick(EYES),
+    // Every preset body colour is dark, so a light eye colour.
+    eyeColor: pick({ white: 1, cream: 1, mint: 1 }),
+  };
+}
+
+/** The status of an AI SDK chat (`useChat().status`). */
+export type ChatStatus = "submitted" | "streaming" | "ready" | "error";
+
+/**
+ * The mood for a chat's status: thinking until the reply starts, writing while it
+ * streams, then happy for a moment (`isHappy`), listening while the user types,
+ * otherwise idle. An error shows `errorMood` (default sorry).
+ */
+export function moodForChat({
+  status,
+  isTyping = false,
+  isHappy = false,
+  errorMood = "sorry",
+}: {
+  status: ChatStatus | undefined;
+  isTyping?: boolean;
+  isHappy?: boolean;
+  errorMood?: AvatarMood;
+}): AvatarMood {
+  if (status === "submitted") return "thinking";
+  if (status === "streaming") return "writing";
+  if (status === "error") return errorMood;
+  if (isHappy) return "happy";
+  return isTyping ? "listening" : "idle";
 }
 
 /** The CSS colour for a preset name or hex value. */

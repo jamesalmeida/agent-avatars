@@ -1,14 +1,17 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
-import { AgentAvatar } from "./agent-avatar";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { AgentAvatar, useGesture } from "./agent-avatar";
 import {
   COLORS,
   EYES,
   EYE_COLORS,
+  GESTURES,
+  MOODS,
   SHAPES,
   colorValue,
   eyeColorValue,
   resolveConfig,
   type AvatarConfig,
+  type AvatarGesture,
   type AvatarMood,
 } from "./config";
 
@@ -16,7 +19,7 @@ export type AvatarEditorProps = {
   /** The avatar being edited. Missing or unknown options show as the defaults. */
   value: Partial<AvatarConfig>;
   onChange: (next: AvatarConfig) => void;
-  /** Show a live preview with a mood switcher above the options. Default true. */
+  /** Show a live preview with mood, gesture and speaking controls above the options. Default true. */
   preview?: boolean;
   /** Preview size in px. Default 140. */
   previewSize?: number;
@@ -24,17 +27,15 @@ export type AvatarEditorProps = {
   followPointer?: boolean | number;
   /** Passed to the preview and the shape tiles (see AgentAvatar's `outline`). */
   outline?: boolean | string;
+  /**
+   * Show the behaviour options (pokes and petting, falling asleep). Default true;
+   * false for a look-only editor, e.g. for a still image.
+   */
+  behaviour?: boolean;
   className?: string;
   style?: CSSProperties;
 };
 
-const MOODS: { id: AvatarMood; label: string }[] = [
-  { id: "idle", label: "Waiting" },
-  { id: "listening", label: "Listening" },
-  { id: "thinking", label: "Thinking" },
-  { id: "writing", label: "Writing" },
-  { id: "happy", label: "Happy" },
-];
 
 // Theme with CSS variables on the editor or any parent. The defaults work on light
 // and dark backgrounds because they mix with the inherited text colour.
@@ -70,7 +71,7 @@ function Segmented<T extends string>({
   onChange: (id: T) => void;
 }) {
   return (
-    <div style={{ display: "inline-flex", flexWrap: "wrap", gap: 4, padding: 4, borderRadius: 999, background: v.control }}>
+    <div style={{ display: "inline-flex", flexWrap: "wrap", gap: 4, padding: 4, borderRadius: 22, background: v.control }}>
       {options.map((option) => {
         const selected = option.id === value;
         return (
@@ -99,6 +100,66 @@ function Segmented<T extends string>({
       })}
     </div>
   );
+}
+
+// A row of buttons that do something (not a choice), styled like Segmented.
+function Actions<T extends string>({ options, onClick }: { options: { id: T; label: string }[]; onClick: (id: T) => void }) {
+  return (
+    <div style={{ display: "inline-flex", flexWrap: "wrap", justifyContent: "center", gap: 4 }}>
+      {options.map((option) => (
+        <button
+          key={option.id}
+          type="button"
+          onClick={() => onClick(option.id)}
+          style={{
+            minHeight: 32,
+            padding: "0 12px",
+            borderRadius: 999,
+            border: `1px solid ${v.border}`,
+            cursor: "pointer",
+            whiteSpace: "nowrap",
+            font: "inherit",
+            fontSize: 13,
+            background: "transparent",
+            color: v.text,
+          }}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+const SLEEP_OPTIONS = [
+  { id: "0", label: "Never" },
+  { id: "10000", label: "10 s" },
+  { id: "30000", label: "30 s" },
+  { id: "60000", label: "1 min" },
+  { id: "300000", label: "5 min" },
+];
+
+// Fakes speech loudness for the preview: syllables about 4.5 a second, in words
+// with short pauses. Writes the --aa-level variable on `ref` (no re-renders).
+function useFakeSpeech(ref: { current: HTMLElement | null }, on: boolean) {
+  useEffect(() => {
+    const element = ref.current;
+    if (!on || !element) return;
+    let frame = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = (now - start) / 1000;
+      const syllable = Math.max(0, Math.sin(t * Math.PI * 9));
+      const inWord = Math.sin(t * Math.PI * 1.4) > -0.35 ? 1 : 0.1;
+      element.style.setProperty("--aa-level", (syllable * inWord * (0.55 + 0.45 * Math.sin(t * 3.1) ** 2)).toFixed(3));
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frame);
+      element.style.removeProperty("--aa-level");
+    };
+  }, [ref, on]);
 }
 
 const ringShadow = `0 0 0 3px ${v.ring}, 0 0 0 5px ${v.accent}`;
@@ -164,8 +225,8 @@ function CustomSwatch({
 }
 
 /**
- * Settings for an AgentAvatar: shape, colour, fill, eyes and eye colour, with an
- * optional live preview. Controlled: pass `value` and save what `onChange` gives you.
+ * Settings for an AgentAvatar: shape, colour, fill, eyes, eye colour, pokes and
+ * falling asleep, with an optional live preview. Controlled: pass `value` and save what `onChange` gives you.
  * Styled inline; theme it with the `--aa-editor-*` CSS variables (see the README).
  */
 export function AvatarEditor({
@@ -175,11 +236,16 @@ export function AvatarEditor({
   previewSize = 140,
   followPointer = true,
   outline,
+  behaviour = true,
   className,
   style,
 }: AvatarEditorProps) {
   const config = resolveConfig(value);
   const [mood, setMood] = useState<AvatarMood>("idle");
+  const [gesture, playGesture] = useGesture();
+  const [speaking, setSpeaking] = useState(false);
+  const stageRef = useRef<HTMLDivElement>(null);
+  useFakeSpeech(stageRef, speaking);
   const set = (patch: Partial<AvatarConfig>) => onChange({ ...config, ...patch });
 
   return (
@@ -190,6 +256,7 @@ export function AvatarEditor({
       {preview ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
           <div
+            ref={stageRef}
             style={{
               display: "flex",
               alignItems: "center",
@@ -200,9 +267,39 @@ export function AvatarEditor({
               background: v.control,
             }}
           >
-            <AgentAvatar {...config} mood={mood} size={previewSize} followPointer={followPointer} outline={outline} label="Avatar preview" />
+            <AgentAvatar
+              {...config}
+              mood={mood}
+              gesture={gesture}
+              size={previewSize}
+              followPointer={followPointer}
+              outline={outline}
+              label="Avatar preview"
+            />
           </div>
-          <Segmented options={MOODS} value={mood} onChange={setMood} />
+          <Segmented options={entries(MOODS)} value={mood} onChange={setMood} />
+          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 8 }}>
+            <Actions options={entries(GESTURES) as { id: AvatarGesture; label: string }[]} onClick={playGesture} />
+            <button
+              type="button"
+              aria-pressed={speaking}
+              onClick={() => setSpeaking((on) => !on)}
+              style={{
+                minHeight: 32,
+                padding: "0 12px",
+                borderRadius: 999,
+                border: `1px solid ${speaking ? v.accent : v.border}`,
+                cursor: "pointer",
+                font: "inherit",
+                fontSize: 13,
+                background: speaking ? v.selected : "transparent",
+                color: v.text,
+                fontWeight: speaking ? 600 : 400,
+              }}
+            >
+              {speaking ? "Speaking…" : "Speak"}
+            </button>
+          </div>
         </div>
       ) : null}
 
@@ -294,6 +391,29 @@ export function AvatarEditor({
           />
         </div>
       </Group>
+
+      {behaviour ? (
+        <>
+          <Group label="Pokes and petting">
+            <Segmented
+              options={[
+                { id: "off", label: "Ignores them" },
+                { id: "on", label: "Reacts" },
+              ]}
+              value={config.interactive ? "on" : "off"}
+              onChange={(id) => set({ interactive: id === "on" })}
+            />
+          </Group>
+
+          <Group label="Falls asleep when idle after">
+            <Segmented
+              options={SLEEP_OPTIONS}
+              value={String(config.sleepAfter)}
+              onChange={(id) => set({ sleepAfter: Number(id) })}
+            />
+          </Group>
+        </>
+      ) : null}
     </div>
   );
 }

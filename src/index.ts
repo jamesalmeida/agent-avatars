@@ -1,4 +1,11 @@
-export { AgentAvatar, useHappyMoment, type AgentAvatarProps } from "./agent-avatar";
+export {
+  AgentAvatar,
+  useAgentMood,
+  useGesture,
+  useHappyMoment,
+  type AgentAvatarProps,
+  type LookTarget,
+} from "./agent-avatar";
 export { AvatarEditor, type AvatarEditorProps } from "./avatar-editor";
 export {
   COLORS,
@@ -6,21 +13,28 @@ export {
   DEFAULT_FOLLOW_RADIUS,
   EYES,
   EYE_COLORS,
+  GESTURES,
   LOOK_RANGE,
+  MAX_SLEEP_AFTER,
+  MOODS,
   SHAPES,
   STAGE,
+  avatarFromSeed,
   avatarStyles,
   colorValue,
   eyeColorValue,
   lookOffset,
+  moodForChat,
   resolveConfig,
   type AvatarColor,
   type AvatarConfig,
   type AvatarEyeColor,
   type AvatarEyes,
   type AvatarFill,
+  type AvatarGesture,
   type AvatarMood,
   type AvatarShape,
   type AvatarStyles,
+  type ChatStatus,
 } from "./config";
 export { STYLE_ELEMENT_ID, agentAvatarCss, injectAgentAvatarStyles } from "./styles";

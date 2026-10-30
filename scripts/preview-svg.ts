@@ -6,7 +6,7 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { COLORS, EYES, EYE_COLORS, SHAPES, STAGE, type AvatarConfig, type AvatarMood } from "../src/config.ts";
 
-type Tile = AvatarConfig & { mood: AvatarMood };
+type Tile = Omit<AvatarConfig, "interactive" | "sleepAfter"> & { mood: AvatarMood };
 
 const TILES: Tile[] = [
   { shape: "squircle", color: "slate", fill: "gradient", eyes: "tall", eyeColor: "white", mood: "idle" },
